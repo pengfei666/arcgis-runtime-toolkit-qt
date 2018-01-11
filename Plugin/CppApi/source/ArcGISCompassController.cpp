@@ -174,6 +174,10 @@ bool ArcGISCompassController::autoHide() const
   return m_autoHide;
 }
 
+/*!
+   \fn QString Esri::ArcGISRuntime::Toolkit::ArcGISCompassController::toolName() const
+   \brief Returns the name of this tool, "ArcGISCompass".
+ */
 QString ArcGISCompassController::toolName() const
 {
   return "ArcGISCompass";
