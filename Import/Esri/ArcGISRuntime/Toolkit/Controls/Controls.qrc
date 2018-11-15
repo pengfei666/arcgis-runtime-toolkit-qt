@@ -26,6 +26,7 @@
         <file>Callout.qml</file>
         <file>Callout20.qml</file>
         <file>Callout100.qml</file>
+        <file>Callout101.qml</file>
         <file>CurrentVersion.qml</file>
         <file>Fader20.qml</file>
         <file>HomeButton20.qml</file>

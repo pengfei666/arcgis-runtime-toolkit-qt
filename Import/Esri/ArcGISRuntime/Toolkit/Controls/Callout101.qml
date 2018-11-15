@@ -13,8 +13,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  ******************************************************************************/
-
-import QtQuick 2.6
+ 
+import QtQuick 2.4
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.0
@@ -42,7 +42,7 @@ import "LeaderPosition.js" as Enums
 Item {
     id: root
     x: 0
-    y: 0
+    y: 0    
 
     /*========================================
          Configurable properties
@@ -100,7 +100,7 @@ Item {
 
         The default width is \c 2.
     */
-    property int borderWidth: 2
+    property int borderWidth: 2 * displayScaleFactor
 
     /*!
         \brief The background color of the Callout.
@@ -128,35 +128,35 @@ Item {
 
         The default value is \c 5.
     */
-    property int cornerRadius: 5
+    property int cornerRadius: 5 * displayScaleFactor
 
     /*!
         \brief The height of the leader line in the Callout.
 
         The default leader height is \c 10.
     */
-    property int leaderHeight: 10
+    property int leaderHeight: 10 * displayScaleFactor
 
     /*!
         \brief The width of the leader line in the Callout.
 
         The default leader width is \c 20.
     */
-    property int leaderWidth: 20
+    property int leaderWidth: 20 * displayScaleFactor
 
     /*!
         \brief The x offset of the placement of the Callout.
 
         The default is \c 0.
     */
-    property int screenOffsetX: 0
+    property int screenOffsetX: 0 * displayScaleFactor
 
     /*!
         \brief The y offset of the placement of the Callout.
 
         The default is \c 0.
     */
-    property int screenOffsetY: 0
+    property int screenOffsetY: 0 * displayScaleFactor
 
     /*!
         \brief The type of accessory button to be displayed in the Callout.
@@ -202,16 +202,18 @@ Item {
     /*!
         \brief The maximum width of the Callout if autoAdjustWidth is true.
     */
-    property real maxWidth: 300
+    property real maxWidth: 300 * displayScaleFactor
 
     /*!
         \brief The width of the Callout if autoAdjustWidth is false.
     */
-    property real calloutWidth: 300
+    property real calloutWidth: 300 * displayScaleFactor
 
     // internal properties
     /*! \internal */
-    property int padding: 3
+    property int padding: 3 * displayScaleFactor
+    /*! \internal */
+    property real displayScaleFactor: (Screen.logicalPixelDensity * 25.4) / (Qt.platform.os === "windows" || Qt.platform.os === "linux" ? 96 : 72)
     /*! \internal */
     property real anchorPointx: 0
     /*! \internal */
@@ -223,9 +225,9 @@ Item {
     /*! \internal */
     property bool calloutVisible
     /*! \internal */
-    property real calloutMaxHeight: 45
+    property real calloutMaxHeight: 45 * displayScaleFactor
     /*! \internal */
-    property real calloutMinWidth: 95
+    property real calloutMinWidth: 95 * displayScaleFactor
     /*! \internal */
     property real calloutMinHeight: calloutMaxHeight
     /*! \internal */
@@ -233,9 +235,9 @@ Item {
     /*! \internal */
     property real rectHeight: 0
     /*! \internal */
-    property real edgeBuffer: 10
+    property real edgeBuffer: 10 * displayScaleFactor
     /*! \internal */
-    property real calloutFramePadding: (2 * internalCornerRadius)
+    property real calloutFramePadding: (2 * internalCornerRadius) * displayScaleFactor
     /*! \internal */
     property string platform: Qt.platform.os
     /*! \internal */
@@ -247,11 +249,11 @@ Item {
     /*! \internal */
     property real imageWidth: rectWidth / 4
     /*! \internal */
-    property real titleWidth: Math.max(0, rectWidth - 95)
+    property real titleWidth: Math.max(0, rectWidth - 95 * displayScaleFactor)
     /*! \internal */
-    property real detailWidth: Math.max(0, rectWidth - 95)
+    property real detailWidth: Math.max(0, rectWidth - 95 * displayScaleFactor)
     /*! \internal */
-    property real cornerOffset: 15
+    property real cornerOffset: 15 * displayScaleFactor
     /*! \internal */
     property bool debug: false
     /*! \internal */
@@ -360,8 +362,8 @@ Item {
 
     Rectangle {
         id: calloutFrame
-        width: (rectWidth + 2 * leaderWidth + edgeBuffer)
-        height: (rectHeight + 2 * leaderHeight + edgeBuffer)
+        width: (rectWidth + 2 * leaderWidth + edgeBuffer) * displayScaleFactor
+        height: (rectHeight + 2 * leaderHeight + edgeBuffer) * displayScaleFactor
         visible: false
         z: 100
         clip: true
@@ -373,7 +375,7 @@ Item {
 
             property bool createPathAndPaint: false
 
-            antialiasing: true
+            antialiasing: true            
 
             // work around for Qt bug with Canvas on iOS.
             // Rendering to Frame buffer object causes weirdness with size.
@@ -386,103 +388,103 @@ Item {
             renderStrategy: Canvas.Cooperative
 
             // handler to override for drawing
-            onPaint: {
+            onPaint: {                
                 screenCoordinates.x = borderWidth;
                 screenCoordinates.y = borderWidth;
                 drawCalloutFrame();
             }
-        }
 
-        Rectangle {
-            id: calloutContentFrame
-            anchors {
-                left: parent.left
-                top: parent.top
-            }
+            Rectangle {
+                id: calloutContentFrame
+                anchors {
+                    left: parent.left
+                    top: parent.top
+                }
 
-            width: childrenRect.width
-            height:childrenRect.height
+                GridLayout {
+                    id: calloutLayout
+                    anchors {
+                        left: parent.left
+                        top: parent.top
+                    }
+                    height: 45 * displayScaleFactor
+                    columns: 3
+                    rows: 2
+                    columnSpacing: 7 * displayScaleFactor
 
-            GridLayout {
-                id: calloutLayout
-                rows: 2
-                flow: GridLayout.TopToBottom
-                Rectangle {
-                    id: imageRect
-                    width: childrenRect.width
-                    height: childrenRect.height
-                    color: "transparent"
-                    Layout.rowSpan: 2
-                    Layout.margins: 7
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                    Image {
-                        id: image
-                        source: calloutData ? calloutData.imageUrl : ""
-                        width: 40
+                    Rectangle {
+                        id: imageRect
+                        width: 40 * displayScaleFactor
                         height: width
-                        fillMode : Image.PreserveAspectFit
+                        color: "transparent"
+                        Layout.rowSpan: 2
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                        Image {
+                            id: image
+                            source: calloutData ? calloutData.imageUrl : ""
+                            width: parent.width
+                            height: width
+                            fillMode : Image.PreserveAspectFit
+                        }
                     }
-                }
 
-                Text {
-                    id: title
-                    text: calloutData ? calloutData.title : ""
-                    wrapMode: Text.NoWrap
-                    color: titleTextColor
-                    font {
-                        pixelSize: 11
-                        family: "sanserif"
+                    Text {
+                        id: title
+                        text: calloutData ? calloutData.title : ""
+                        wrapMode: Text.NoWrap
+                        renderType: Text.NativeRendering
+                        color: titleTextColor
+                        font {
+                            pixelSize: 11 * displayScaleFactor
+                            family: "sanserif"
+                        }
+                        clip: true
+                        elide: Text.ElideRight
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.maximumWidth: !autoAdjustWidth ? titleWidth : Math.max(0, adjustedMaxWidth - 90 * displayScaleFactor) // resets to implicit width if non-autoAdjust
                     }
-                    clip: true
-                    elide: Text.ElideRight
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.maximumWidth: !autoAdjustWidth ? titleWidth : Math.max(0, adjustedMaxWidth - 90) // resets to implicit width if non-autoAdjust
-                    Layout.fillWidth: true
-                    Layout.margins: 7
-                }
 
-                Text {
-                    id: detail
-                    text: calloutData ? calloutData.detail : ""
-                    color: detailTextColor
-                    font {
-                        pixelSize: 10
-                        family: "sanserif"
-                    }
-                    wrapMode: Text.NoWrap
-                    elide: Text.ElideRight
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.fillWidth: true
-                    Layout.maximumWidth: !autoAdjustWidth ? detailWidth : Math.max(0, adjustedMaxWidth - 90 ) // resets to implicit width if non-autoAdjust
-                    Layout.margins: 7
-                }
-
-                Rectangle {
-                    id: accessoryButton
-                    width: childrenRect.width
-                    height: childrenRect.height
-                    color: "transparent"
-                    Layout.rowSpan: 2
-                    Layout.margins: 7
-
-                    Image {
-                        id: accessoryButtonImage
-                        width: 40
+                    Rectangle {
+                        id: accessoryButton
+                        width: 40 * displayScaleFactor
                         height: width
-                        fillMode: Image.PreserveAspectFit
-                        visible: !accessoryButtonHidden
+                        color: "transparent"
+                        Layout.rowSpan: 2
+
+                        Image {
+                            id: accessoryButtonImage
+                            anchors.fill: parent
+                            width: 40 * displayScaleFactor
+                            height: width
+                            fillMode: Image.PreserveAspectFit
+                            visible: !accessoryButtonHidden
+                        }
+
+                        MouseArea {
+                          id: region
+                          anchors.fill: parent
+                          onClicked: accessoryButtonClicked()
+                          visible: !accessoryButtonHidden
+                        }
                     }
 
-                    MouseArea {
-                        id: region
-                        anchors.fill: parent
-                        onClicked: accessoryButtonClicked()
-                        visible: !accessoryButtonHidden
+                    Text {
+                        id: detail
+                        text: calloutData ? calloutData.detail : ""
+                        renderType: Text.NativeRendering
+                        color: detailTextColor
+                        font {
+                            pixelSize: 10 * displayScaleFactor
+                            family: "sanserif"
+                        }
+                        wrapMode: Text.NoWrap
+                        elide: Text.ElideRight
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.maximumWidth: !autoAdjustWidth ? detailWidth : Math.max(0, adjustedMaxWidth - 90 * displayScaleFactor) // resets to implicit width if non-autoAdjust
                     }
                 }
             }
-
         }
     }
 
@@ -519,7 +521,7 @@ Item {
 
         ctx.beginPath();
 
-        if (adjustedLeaderPosition === Enums.LeaderPosition.UpperLeft) {
+        if (adjustedLeaderPosition === Enums.LeaderPosition.UpperLeft) {            
             ctx.moveTo(screenCoordinates.x + leaderWidth + cornerOffset, screenCoordinates.y);
         } else {
             ctx.moveTo(screenCoordinates.x + internalCornerRadius, screenCoordinates.y);
@@ -628,16 +630,16 @@ Item {
         if (leaderPosition === Enums.LeaderPosition.Automatic) {
 
             // Move leader vertically if vertical position isn't optimal
-            if (calloutFrame.y - edgeBuffer < 0 + mapViewInsets.top) {
+            if (calloutFrame.y - edgeBuffer < 0 + mapViewInsets.top * displayScaleFactor) {
                 // Top edge of callout is above top edge of map
                 refresh = moveLeader(Enums.LeaderMoveDirection.Up, mousex, mousey);
             }
 
             // Move leader horizontally if horizontal position isn't optimal
-            if (calloutFrame.x - edgeBuffer < 0 + mapViewInsets.left) {
+            if (calloutFrame.x - edgeBuffer < 0 + mapViewInsets.left * displayScaleFactor) {
                 // Left edge of callout is left of left edge of map
                 refresh = moveLeader(Enums.LeaderMoveDirection.Left, mousex, mousey);
-            } else if (calloutFrame.x + rectWidth + edgeBuffer > root.parent.width - mapViewInsets.right) {
+            } else if (calloutFrame.x + rectWidth + edgeBuffer > root.parent.width - mapViewInsets.right * displayScaleFactor) {
                 // Right edge of callout is right of right edge of map
                 refresh = moveLeader(Enums.LeaderMoveDirection.Right, mousex, mousey);
             }
@@ -660,181 +662,181 @@ Item {
 
         // Callout is 'narrow' if it's less than half the width of the MapView
         var narrowCallout = true;
-        if (calloutFrame.width > (mapViewWidth + (mapViewInsets.left + mapViewInsets.right)) / 2) {
-            narrowCallout = false;
+        if (calloutFrame.width > (mapViewWidth + (mapViewInsets.left + mapViewInsets.right) * displayScaleFactor) / 2) {
+          narrowCallout = false;
         }
 
         // Callout is 'short' if it's less than half the height of the MapView
         var shortCallout = true;
-        if (calloutFrame.height > (mapViewHeight + (mapViewInsets.top + mapViewInsets.bottom)) / 2) {
-            shortCallout = false;
+        if (calloutFrame.height > (mapViewHeight + (mapViewInsets.top + mapViewInsets.bottom) * displayScaleFactor) / 2) {
+          shortCallout = false;
         }
 
         switch (direction) {
-        case Enums.LeaderMoveDirection.Down:
+          case Enums.LeaderMoveDirection.Down:
             // Bottom edge of callout is below bottom edge of map.
             // Move leader down so the callout moves up
             switch (adjustedLeaderPosition) {
-            case Enums.LeaderPosition.UpperLeft:
+              case Enums.LeaderPosition.UpperLeft:
                 if (shortCallout || anchorY > mapViewHeight / 3) {
-                    adjustedLeaderPosition = Enums.LeaderPosition.Left;
-                    refresh = true;
+                  adjustedLeaderPosition = Enums.LeaderPosition.Left;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Left:
+              case Enums.LeaderPosition.Left:
                 if (shortCallout || anchorY > mapViewHeight * 2 / 3) {
-                    adjustedLeaderPosition = Enums.LeaderPosition.LowerLeft;
-                    refresh = true;
+                  adjustedLeaderPosition = Enums.LeaderPosition.LowerLeft;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Top:
+              case Enums.LeaderPosition.Top:
                 if (shortCallout || anchorY > mapViewHeight / 2) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Bottom;
                     refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.UpperRight:
+              case Enums.LeaderPosition.UpperRight:
                 if (shortCallout || anchorY > mapViewHeight / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Right;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Right:
+              case Enums.LeaderPosition.Right:
                 if (shortCallout || anchorY > mapViewHeight * 2 / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.LowerRight;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
             }
             break;
-        case Enums.LeaderMoveDirection.Up:
+          case Enums.LeaderMoveDirection.Up:
             // Top edge of callout is above top edge of map.
             // Move leader up so the callout moves down
             switch (adjustedLeaderPosition) {
-            case Enums.LeaderPosition.LowerLeft:
+              case Enums.LeaderPosition.LowerLeft:
                 if (shortCallout || anchorY < mapViewHeight * 2 / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Left
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Left:
+              case Enums.LeaderPosition.Left:
                 if (shortCallout || anchorY < mapViewHeight / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.UpperLeft;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Bottom:
+              case Enums.LeaderPosition.Bottom:
                 if (shortCallout || anchorY < mapViewHeight / 2) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Top;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.LowerRight:
+              case Enums.LeaderPosition.LowerRight:
                 if (shortCallout || anchorY < mapViewHeight * 2 / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Right;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Right:
+              case Enums.LeaderPosition.Right:
                 if (shortCallout || anchorY < mapViewHeight / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.UpperRight;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
             }
             break;
-        case Enums.LeaderMoveDirection.Left:
+          case Enums.LeaderMoveDirection.Left:
             // Left edge of callout is left of left edge of map.
             // Move leader to the left so the callout moves right
             switch (adjustedLeaderPosition) {
-            case Enums.LeaderPosition.UpperRight:
+              case Enums.LeaderPosition.UpperRight:
                 if (narrowCallout || anchorX < mapViewWidth * 2 / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Top;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Right:
+              case Enums.LeaderPosition.Right:
                 if (narrowCallout || anchorX < mapViewWidth / 2) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Left;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.LowerRight:
+              case Enums.LeaderPosition.LowerRight:
                 if (narrowCallout || anchorX < mapViewWidth * 2 / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Bottom;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Top:
+              case Enums.LeaderPosition.Top:
                 if (narrowCallout || anchorX < mapViewWidth / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.UpperLeft;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Bottom:
+              case Enums.LeaderPosition.Bottom:
                 if (narrowCallout || anchorX < mapViewWidth * 2 / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.LowerLeft;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.LowerLeft:
+              case Enums.LeaderPosition.LowerLeft:
                 if (narrowCallout || anchorX < mapViewWidth / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Left;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.UpperLeft:
+              case Enums.LeaderPosition.UpperLeft:
                 if (narrowCallout || anchorX < mapViewWidth / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Left;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
             }
             break;
-        case Enums.LeaderMoveDirection.Right:
+          case Enums.LeaderMoveDirection.Right:
             // Right edge of callout is right of right edge of map.
             // Move leader to the right so the callout moves left
             switch (adjustedLeaderPosition) {
-            case Enums.LeaderPosition.UpperLeft:
+              case Enums.LeaderPosition.UpperLeft:
                 if (narrowCallout || anchorX > mapViewWidth / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Top;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Left:
+              case Enums.LeaderPosition.Left:
                 if (narrowCallout || anchorX > mapViewWidth / 2) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Right;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.LowerLeft:
+              case Enums.LeaderPosition.LowerLeft:
                 if (narrowCallout || anchorX > mapViewWidth / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Bottom;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Top:
+              case Enums.LeaderPosition.Top:
                 if (narrowCallout || anchorX > mapViewWidth * 2 / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.UpperRight;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.Bottom:
+              case Enums.LeaderPosition.Bottom:
                 if (narrowCallout || anchorX > mapViewWidth * 2 / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.LowerRight;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.LowerRight:
+              case Enums.LeaderPosition.LowerRight:
                 if (narrowCallout || anchorX > mapViewWidth * 2 / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Right;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
-            case Enums.LeaderPosition.UpperRight:
+              case Enums.LeaderPosition.UpperRight:
                 if (narrowCallout || anchorX > mapViewWidth * 2 / 3) {
                     adjustedLeaderPosition = Enums.LeaderPosition.Right;
-                    refresh = true;
+                  refresh = true;
                 }
                 break;
             }
@@ -906,6 +908,7 @@ Item {
             console.log("maxWidth = ", maxWidth);
             console.log("calloutWidth = ", calloutWidth);
             console.log("adjustedMaxWidth = ", adjustedMaxWidth);
+            console.log("displayScaleFactor = ", displayScaleFactor);
         }
     }
 
